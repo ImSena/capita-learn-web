@@ -379,7 +379,7 @@ header>.search_content>label {
     width: 100vw;
     background-color: blue;
     height: 100vh;
-    background-image: url("/capitalearn/resources/images/image-index.jpg");
+    background-image: url("/CapitaLearnWEB_war_exploded/resources/images/image-index.jpg");
     background-repeat: no-repeat;
     background-clip: border-box;
     background-size: cover;

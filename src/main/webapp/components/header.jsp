@@ -6,6 +6,8 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <header>
     <nav>
         <div>
@@ -37,7 +39,10 @@
         </div>
 
         <div>
-            <span id="value_total">R$ 5036,13</span>
+            <span id="value_total">
+                <fmt:setLocale value="pt_BR"/>
+                <fmt:formatNumber value="${user.amount}" type="currency" currencySymbol="R$" groupingUsed="true" maxFractionDigits="2"/>
+            </span>
         </div>
     </div>
 </header>

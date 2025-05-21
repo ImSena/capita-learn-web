@@ -15,24 +15,31 @@
 
     <main class="container" style="max-width: 600px; margin-top: 2rem;">
       <h2>Perfil do Usuário</h2>
+      <c:if test="${not empty success}">
+        <div class="alert alert-success">${success}</div>
+      </c:if>
 
-      <form id="form-perfil" method="POST" action="/perfil/atualizar">
+      <c:if test="${not empty error}">
+        <div class="alert alert-danger">${error}</div>
+      </c:if>
+
+      <form id="form-perfil" method="POST" action="perfil">
         <div class="mb-3">
           <label for="nome" class="form-label">Nome Completo</label>
-          <input type="text" class="form-control" id="nome" name="nome" placeholder="Seu nome completo"
+          <input type="text" class="form-control" id="nome" value="${user.fullName}" name="nome" placeholder="Seu nome completo"
                  required>
         </div>
 
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
           <input type="email" class="form-control" id="email" name="email" placeholder="email@exemplo.com"
-                 required>
+                 required value="${user.email}">
         </div>
 
         <div class="mb-3">
           <label for="telefone" class="form-label">Telefone</label>
           <input type="tel" class="form-control" id="telefone" name="telefone"
-                 placeholder="(99) 99999-9999">
+                 placeholder="(99) 99999-9999" value="${user.phoneNumber}">
         </div>
 
         <div class="mb-3">

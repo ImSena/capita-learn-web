@@ -16,7 +16,7 @@ public class OracleUserDao implements UserDao {
     private Connection conn;
 
     @Override
-    public void register(User user, double initialBalance) throws DBException {
+    public void register(User user) throws DBException {
         PreparedStatement balanceStmt = null;
         PreparedStatement getBalanceIdStmt = null;
         PreparedStatement userStmt = null;
@@ -29,7 +29,7 @@ public class OracleUserDao implements UserDao {
             String sqlBalance = "INSERT INTO t_cl_balance(balance_id, balance_amount, created_at, updated_at) " +
                     "VALUES (seq_balance_id.NEXTVAL, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
             balanceStmt = conn.prepareStatement(sqlBalance);
-            balanceStmt.setDouble(1, initialBalance);
+            balanceStmt.setDouble(1, user.getAmount());
             balanceStmt.executeUpdate();
 
             String sqlGetBalanceId = "SELECT seq_balance_id.CURRVAL FROM dual";
@@ -60,7 +60,7 @@ public class OracleUserDao implements UserDao {
                 if (conn != null) {
                     conn.rollback();
                 }
-            }catch (SQLException rollbackEx) {
+            } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
             }
             e.printStackTrace();
@@ -71,9 +71,15 @@ public class OracleUserDao implements UserDao {
                 if (balanceStmt != null) balanceStmt.close();
                 if (getBalanceIdStmt != null) getBalanceIdStmt.close();
                 if (userStmt != null) userStmt.close();
-                if (conn != null) conn.setAutoCommit(true);
-                conn.close();
-            }catch (SQLException e) {
+                if (conn != null) {
+                    try {
+                        conn.setAutoCommit(true);
+                        conn.close();
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -81,7 +87,49 @@ public class OracleUserDao implements UserDao {
 
     @Override
     public User findByEmail(String email) throws DBException {
-        return null;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        User user = null;
+
+        try {
+            conn = ConnectionManager.getInstance().getConnection();
+            String sql = "SELECT u.user_id, u.email, u.password_hash, u.full_name, u.dt_birth, u.phone_number, " +
+                    "u.is_active, u.role, b.balance_amount " +
+                    "FROM t_cl_user u " +
+                    "JOIN t_cl_balance b ON u.balance_id = b.balance_id " +
+                    "WHERE u.email = ?";
+
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, email);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                user = new User();
+                user.setId(rs.getInt("user_id"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password_hash"));
+                user.setFullName(rs.getString("full_name"));
+                user.setDateOfBirth(rs.getDate("dt_birth").toLocalDate());
+                user.setPhoneNumber(rs.getString("phone_number"));
+                user.setActive("Y".equals(rs.getString("is_active")));
+                user.setRole(rs.getString("role"));
+                user.setAmount(rs.getDouble("balance_amount"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DBException("Erro ao buscar usuário");
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return user;
     }
 
     @Override
@@ -96,7 +144,32 @@ public class OracleUserDao implements UserDao {
 
     @Override
     public void update(User user) throws DBException {
+        PreparedStatement stmt = null;
 
+        try {
+            conn = ConnectionManager.getInstance().getConnection();
+
+            String sql = "UPDATE t_cl_user SET full_name = ?, email = ?, phone_number = ?, password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, user.getFullName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPhoneNumber());
+            stmt.setString(4, user.getPassword()); // atenção aqui
+            stmt.setInt(5, user.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DBException("Erro ao atualizar usuário");
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

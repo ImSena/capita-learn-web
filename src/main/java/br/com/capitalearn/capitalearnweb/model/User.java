@@ -40,6 +40,15 @@ public class User implements Serializable {
         this.role = role;
     }
 
+    public User(String fullName, LocalDate dateOfBirth, String email, String phoneNumber, Double amount,  String password) {
+        this.fullName = fullName;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.amount = amount;
+        this.password = password;
+    }
+
     public int getId() {
         return id;
     }
@@ -101,7 +110,7 @@ public class User implements Serializable {
     }
 
     public void setActive(boolean active) {
-        active = active;
+        this.active = active;
     }
 
     public String getRole() {

@@ -14,7 +14,7 @@
   <div class="d-flex flex-column container p-5 justify-content-center align-items-center">
     <h3 class="contrast">Bem-Vindo de Volta!</h3>
     <p>Sua jornada para sua organização financeira começa aqui</p>
-    <form action="${pageContext.request.contextPath}/login" class="w-100" style="max-width: 360px;">
+    <form action="${pageContext.request.contextPath}/login" method="post" class="w-100" style="max-width: 360px;">
       <div class="mb-3 input-group bg-dark-subtle rounded px-2 py-1">
                     <span class="input-group-text bg-transparent border-0 text-secondary">
                         <i class="fa fa-user"></i>
@@ -39,8 +39,13 @@
         <a href="/esqueceu-senha" class="small contrast">Esqueceu a senha?</a>
       </div>
 
-      <button class="btn btn-actions w-100">Entrar <i class="fa-regular fa-circle-up"></i></button>
+      <button class="btn btn-actions w-100" type="submit">Entrar<i class="fa-regular fa-circle-up"></i></button>
     </form>
+
+      <% String error = (String) request.getAttribute("error"); %>
+      <% if (error != null) { %>
+      <div class="alert alert-danger mt-3 w-100 text-center"><%= error %></div>
+      <% } %>
 
     <p>Não tem uma conta? <a class="contrast" href="${pageContext.request.contextPath}/cadastro">Cadastre-se</a></p>
   </div>
