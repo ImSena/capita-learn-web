@@ -14,7 +14,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
       <div class="modal-body">
-        <form id="formRetirar">
+        <form id="formRetirar" action="adicionar" method="POST">
+          <input type="hidden" name="action" value="adicionar" />
           <div class="mb-3">
             <label for="valorRetirar" class="form-label">Valor</label>
             <input type="number" class="form-control" id="valorRetirar" placeholder="Ex: 50.00"

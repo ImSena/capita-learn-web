@@ -17,65 +17,66 @@ public class OracleUserDao implements UserDao {
 
     @Override
     public void register(User user) throws DBException {
-        PreparedStatement balanceStmt = null;
-        PreparedStatement getBalanceIdStmt = null;
         PreparedStatement userStmt = null;
+        PreparedStatement getUserIdStmt = null;
+        PreparedStatement balanceStmt = null;
         ResultSet rs = null;
+
         try {
             conn = ConnectionManager.getInstance().getConnection();
-
             conn.setAutoCommit(false);
 
-            String sqlBalance = "INSERT INTO t_cl_balance(balance_id, balance_amount, created_at, updated_at) " +
-                    "VALUES (seq_balance_id.NEXTVAL, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-            balanceStmt = conn.prepareStatement(sqlBalance);
-            balanceStmt.setDouble(1, user.getAmount());
-            balanceStmt.executeUpdate();
+            String sqlUser = "INSERT INTO t_cl_user (user_id, email, password_hash, full_name, dt_birth, phone_number, created_at, updated_at, is_active, role) " +
+                    "VALUES (seq_user_id.NEXTVAL, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)";
 
-            String sqlGetBalanceId = "SELECT seq_balance_id.CURRVAL FROM dual";
-            getBalanceIdStmt = conn.prepareStatement(sqlGetBalanceId);
-            rs = getBalanceIdStmt.executeQuery();
-            int balanceId = -1;
-            if (rs.next()) {
-                balanceId = rs.getInt(1);
-            }
-
-            String sqlUser = "INSERT INTO t_cl_user (user_id, balance_id, email, password_hash, full_name, dt_birth, phone_number, created_at, updated_at, is_active, role) " +
-                    "VALUES (seq_user_id.NEXTVAL, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)";
             userStmt = conn.prepareStatement(sqlUser);
-            userStmt.setInt(1, balanceId);
-            userStmt.setString(2, user.getEmail());
-            userStmt.setString(3, user.getPassword());
-            userStmt.setString(4, user.getFullName());
-            userStmt.setDate(5, java.sql.Date.valueOf(user.getDateOfBirth()));
-            userStmt.setString(6, user.getPhoneNumber());
-            userStmt.setString(7, user.isActive() ? "Y" : "N");
-            userStmt.setString(8, user.getRole());
+            userStmt.setString(1, user.getEmail());
+            userStmt.setString(2, user.getPassword());
+            userStmt.setString(3, user.getFullName());
+            userStmt.setDate(4, java.sql.Date.valueOf(user.getDateOfBirth()));
+            userStmt.setString(5, user.getPhoneNumber());
+            userStmt.setString(6, user.isActive() ? "Y" : "N");
+            userStmt.setString(7, user.getRole());
 
             userStmt.executeUpdate();
+
+            String sqlGetUserId = "SELECT seq_user_id.CURRVAL FROM dual";
+            getUserIdStmt = conn.prepareStatement(sqlGetUserId);
+            rs = getUserIdStmt.executeQuery();
+
+            int userId = -1;
+            if (rs.next()) {
+                userId = rs.getInt(1);
+            }
+
+            String sqlBalance = "INSERT INTO t_cl_balance (balance_id, balance_amount, created_at, updated_at, user_id) " +
+                    "VALUES (seq_balance_id.NEXTVAL, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
+
+            balanceStmt = conn.prepareStatement(sqlBalance);
+            balanceStmt.setDouble(1, user.getAmount());
+            balanceStmt.setInt(2, userId);
+            balanceStmt.executeUpdate();
 
             conn.commit();
         } catch (SQLException e) {
             try {
-                if (conn != null) {
-                    conn.rollback();
-                }
+                if (conn != null) conn.rollback();
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
             }
             e.printStackTrace();
-            throw new DBException("Erro ao cadastrar usuario");
+            throw new DBException("Erro ao cadastrar usuário");
         } finally {
             try {
                 if (rs != null) rs.close();
-                if (balanceStmt != null) balanceStmt.close();
-                if (getBalanceIdStmt != null) getBalanceIdStmt.close();
                 if (userStmt != null) userStmt.close();
+                if (getUserIdStmt != null) getUserIdStmt.close();
+                if (balanceStmt != null) balanceStmt.close();
                 if (conn != null) {
                     try {
                         conn.setAutoCommit(true);
                         conn.close();
-                    }catch (SQLException e){
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
@@ -97,7 +98,7 @@ public class OracleUserDao implements UserDao {
             String sql = "SELECT u.user_id, u.email, u.password_hash, u.full_name, u.dt_birth, u.phone_number, " +
                     "u.is_active, u.role, b.balance_amount " +
                     "FROM t_cl_user u " +
-                    "JOIN t_cl_balance b ON u.balance_id = b.balance_id " +
+                    "JOIN t_cl_balance b ON u.user_id = b.user_id " +
                     "WHERE u.email = ?";
 
             stmt = conn.prepareStatement(sql);

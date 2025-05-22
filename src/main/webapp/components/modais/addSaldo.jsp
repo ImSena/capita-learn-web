@@ -17,14 +17,22 @@
       <div class="modal-body">
         <form id="formAdicionar">
           <div class="mb-3">
+            <input type="hidden" name="action" value="adicionar" />
             <label for="valorAdicionar" class="form-label">Valor</label>
             <input type="number" class="form-control" id="valorAdicionar" placeholder="Ex: 150.00"
                    required>
           </div>
           <div class="mb-3">
-            <label for="descricaoAdicionar" class="form-label">Descrição</label>
-            <input type="text" class="form-control" id="descricaoAdicionar" placeholder="Ex: Salário">
+            <label for="title" class="form-label">Descrição</label>
+            <input type="text" class="form-control" id="title" placeholder="Ex: Salário">
           </div>
+          <div class="mb-3">
+            <label for="descricaoAdicionar" class="form-label">Descrição</label>
+            <input type="text" class="form-control" id="descricaoAdicionar" placeholder="Ex: Empresa X">
+          </div>
+          <input type="hidden" name="transactionType" value="ADD"/>
+          <input type="hidden" name="category" value="NORMAL"/>
+
           <button type="submit" class="btn btn-success">Adicionar</button>
         </form>
       </div>
