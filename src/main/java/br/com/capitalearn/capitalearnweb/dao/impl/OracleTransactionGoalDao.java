@@ -2,6 +2,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.TransactionGoalDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.TransactionGoal;
 
@@ -10,13 +11,15 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleTransactionGoalDao implements TransactionGoalDao {
-    private Connection conn;
+public class OracleTransactionGoalDao extends BaseDao implements TransactionGoalDao {
+    public OracleTransactionGoalDao(Connection conn) {
+        super(conn);
+    }
+
     @Override
-    public void register(TransactionGoal goal) throws DBException {
+    public int register(TransactionGoal goal) throws DBException {
         PreparedStatement stmt = null;
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "INSERT INTO t_cl_transaction_goal (transaction_goal_id, transaction_id, goal_id) " +
                     "VALUES (seq_transaction_goal_id.NEXTVAL, ?, ?)";
             stmt = conn.prepareStatement(sql);
@@ -24,13 +27,13 @@ public class OracleTransactionGoalDao implements TransactionGoalDao {
             stmt.setInt(2, goal.getTransactionId());
             stmt.executeUpdate();
 
+            return getCurrval("seq_transaction_goal_id");
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DBException("Não foi possível atualizar o investimento");
+            throw new DBException("Não foi possível registrar a transação da meta");
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -43,7 +46,6 @@ public class OracleTransactionGoalDao implements TransactionGoalDao {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_transaction_goal WHERE transaction_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, transactionId);
@@ -60,11 +62,10 @@ public class OracleTransactionGoalDao implements TransactionGoalDao {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DBException("Não foi possível atualizar o investimento");
+            throw new DBException("Não foi possível econtrar as transações da meta");
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
                 if (rs != null) rs.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -79,7 +80,6 @@ public class OracleTransactionGoalDao implements TransactionGoalDao {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_transaction_goal WHERE goal_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, goalId);
@@ -96,11 +96,10 @@ public class OracleTransactionGoalDao implements TransactionGoalDao {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DBException("Não foi possível atualizar o investimento");
+            throw new DBException("Não foi possível encontrar a transação da meta");
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
                 if (stmt != null) stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -114,7 +113,6 @@ public class OracleTransactionGoalDao implements TransactionGoalDao {
         PreparedStatement stmt = null;
 
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "DELETE FROM t_cl_transaction_goal WHERE transaction_goal_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, transactionGoalId);
@@ -125,7 +123,6 @@ public class OracleTransactionGoalDao implements TransactionGoalDao {
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

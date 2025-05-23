@@ -2,6 +2,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.UserDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.User;
 
@@ -11,21 +12,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class OracleUserDao implements UserDao {
+public class OracleUserDao extends BaseDao implements UserDao {
 
-    private Connection conn;
+    public OracleUserDao(Connection conn){
+        super(conn);
+    }
 
     @Override
-    public void register(User user) throws DBException {
+    public int register(User user) throws DBException {
         PreparedStatement userStmt = null;
-        PreparedStatement getUserIdStmt = null;
-        PreparedStatement balanceStmt = null;
-        ResultSet rs = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
-            conn.setAutoCommit(false);
-
             String sqlUser = "INSERT INTO t_cl_user (user_id, email, password_hash, full_name, dt_birth, phone_number, created_at, updated_at, is_active, role) " +
                     "VALUES (seq_user_id.NEXTVAL, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)";
 
@@ -40,46 +37,14 @@ public class OracleUserDao implements UserDao {
 
             userStmt.executeUpdate();
 
-            String sqlGetUserId = "SELECT seq_user_id.CURRVAL FROM dual";
-            getUserIdStmt = conn.prepareStatement(sqlGetUserId);
-            rs = getUserIdStmt.executeQuery();
+            return getCurrval("seq_user_id");
 
-            int userId = -1;
-            if (rs.next()) {
-                userId = rs.getInt(1);
-            }
-
-            String sqlBalance = "INSERT INTO t_cl_balance (balance_id, balance_amount, created_at, updated_at, user_id) " +
-                    "VALUES (seq_balance_id.NEXTVAL, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
-
-            balanceStmt = conn.prepareStatement(sqlBalance);
-            balanceStmt.setDouble(1, user.getAmount());
-            balanceStmt.setInt(2, userId);
-            balanceStmt.executeUpdate();
-
-            conn.commit();
         } catch (SQLException e) {
-            try {
-                if (conn != null) conn.rollback();
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
-            }
             e.printStackTrace();
             throw new DBException("Erro ao cadastrar usuário");
         } finally {
             try {
-                if (rs != null) rs.close();
                 if (userStmt != null) userStmt.close();
-                if (getUserIdStmt != null) getUserIdStmt.close();
-                if (balanceStmt != null) balanceStmt.close();
-                if (conn != null) {
-                    try {
-                        conn.setAutoCommit(true);
-                        conn.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -88,13 +53,11 @@ public class OracleUserDao implements UserDao {
 
     @Override
     public User findByEmail(String email) throws DBException {
-        Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         User user = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT u.user_id, u.email, u.password_hash, u.full_name, u.dt_birth, u.phone_number, " +
                     "u.is_active, u.role, b.balance_amount " +
                     "FROM t_cl_user u " +
@@ -125,7 +88,6 @@ public class OracleUserDao implements UserDao {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -148,8 +110,6 @@ public class OracleUserDao implements UserDao {
         PreparedStatement stmt = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
-
             String sql = "UPDATE t_cl_user SET full_name = ?, email = ?, phone_number = ?, password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
 
             stmt = conn.prepareStatement(sql);
@@ -166,7 +126,6 @@ public class OracleUserDao implements UserDao {
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

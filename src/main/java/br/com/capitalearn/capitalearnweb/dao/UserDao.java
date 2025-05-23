@@ -6,7 +6,7 @@ import br.com.capitalearn.capitalearnweb.model.User;
 import java.util.List;
 
 public interface UserDao {
-    void register(User user) throws DBException;
+    int register(User user) throws DBException;
     User findByEmail(String email) throws DBException;
     User findById(int id) throws DBException;
     List<User> findAll() throws DBException;

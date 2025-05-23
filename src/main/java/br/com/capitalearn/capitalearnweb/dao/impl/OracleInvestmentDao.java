@@ -2,6 +2,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.InvestmentDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.Investment;
 import oracle.jdbc.proxy.annotation.Pre;
@@ -13,16 +14,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleInvestmentDao implements InvestmentDao {
-    private Connection conn;
+public class OracleInvestmentDao extends BaseDao implements InvestmentDao {
+    public OracleInvestmentDao(Connection conn) {
+        super(conn);
+    }
 
     @Override
-    public void register(Investment investment) throws DBException {
+    public int register(Investment investment) throws DBException {
         PreparedStatement stmt = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
-
             String sql = "INSERT INTO t_cl_investment (investment_id, user_id, investment_type, amount, is_recurring, created_at, updated_at) " +
                     "VALUES (seq_investment_id.NEXTVAL, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
@@ -34,13 +35,14 @@ public class OracleInvestmentDao implements InvestmentDao {
 
             stmt.executeUpdate();
 
+            return getCurrval("seq_investment_id");
+
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Não foi possível cadastrar o investimento");
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -54,8 +56,6 @@ public class OracleInvestmentDao implements InvestmentDao {
         ResultSet rs = null;
 
         try {
-
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_investment WHERE user_id = ? ORDER BY created_at DESC";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, userId);
@@ -78,7 +78,6 @@ public class OracleInvestmentDao implements InvestmentDao {
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
                 if (rs != null) rs.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -96,7 +95,6 @@ public class OracleInvestmentDao implements InvestmentDao {
     public void update(Investment investment) throws DBException {
         PreparedStatement stmt = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "UPDATE t_cl_investment SET " +
                     "investment_type = ?, " +
                     "amount = ?, " +
@@ -116,7 +114,6 @@ public class OracleInvestmentDao implements InvestmentDao {
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -124,22 +121,20 @@ public class OracleInvestmentDao implements InvestmentDao {
     }
 
     @Override
-    public void delete(int id, int userId) throws DBException {
+    public void delete(Investment investment) throws DBException {
         PreparedStatement stmt = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "DELETE FROM t_cl_investment WHERE investment_id = ? AND user_id = ?";
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
-            stmt.setInt(2, userId);
+            stmt.setInt(1, investment.getInvestmentId());
+            stmt.setInt(2, investment.getUserId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DBException("Não foi possível atualizar o investimento");
+            throw new DBException("Não foi possível deletar o investimento");
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

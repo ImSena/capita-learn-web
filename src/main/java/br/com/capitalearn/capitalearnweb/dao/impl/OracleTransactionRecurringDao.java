@@ -2,6 +2,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.TransactionRecurringDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.TransactionRecurring;
 
@@ -12,14 +13,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleTransactionRecurringDao implements TransactionRecurringDao {
-    private Connection conn;
+public class OracleTransactionRecurringDao extends BaseDao implements TransactionRecurringDao {
+    public OracleTransactionRecurringDao(Connection conn) {
+        super(conn);
+    }
 
     @Override
-    public void register(TransactionRecurring recurring) throws DBException {
+    public int register(TransactionRecurring recurring) throws DBException {
         PreparedStatement stmt = null;
+        PreparedStatement stmtId = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "INSERT INTO t_cl_transaction_recurring (transaction_recurring_id, transaction_id, recurring_id) " +
                     "VALUES (seq_transaction_recurring_id.NEXTVAL, ?, ?)";
             stmt = conn.prepareStatement(sql);
@@ -27,13 +30,14 @@ public class OracleTransactionRecurringDao implements TransactionRecurringDao {
             stmt.setInt(2, recurring.getRecurringId());
             stmt.executeUpdate();
 
+            return getCurrval("seq_transaction_recurring");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Não foi possível registrar a transação recorrente");
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
+                if (stmtId != null) stmtId.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -46,7 +50,6 @@ public class OracleTransactionRecurringDao implements TransactionRecurringDao {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_transaction_recurring WHERE transaction_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, transactionId);
@@ -67,7 +70,6 @@ public class OracleTransactionRecurringDao implements TransactionRecurringDao {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -81,7 +83,6 @@ public class OracleTransactionRecurringDao implements TransactionRecurringDao {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_transaction_recurring WHERE recurring_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, recurringId);
@@ -102,7 +103,6 @@ public class OracleTransactionRecurringDao implements TransactionRecurringDao {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -114,7 +114,6 @@ public class OracleTransactionRecurringDao implements TransactionRecurringDao {
     public void delete(int transactionRecurringId) throws DBException {
         PreparedStatement stmt = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "DELETE FROM t_cl_transaction_recurring WHERE transaction_recurring_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, transactionRecurringId);
@@ -125,7 +124,6 @@ public class OracleTransactionRecurringDao implements TransactionRecurringDao {
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

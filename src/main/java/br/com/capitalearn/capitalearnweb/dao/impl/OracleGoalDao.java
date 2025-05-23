@@ -2,6 +2,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.GoalDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.Goal;
 
@@ -9,12 +10,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleGoalDao implements GoalDao {
+public class OracleGoalDao extends BaseDao implements GoalDao {
 
-    private Connection conn;
+    public OracleGoalDao(Connection conn) {
+        super(conn);
+    }
 
     @Override
-    public void register(Goal goal) throws DBException {
+    public int register(Goal goal) throws DBException {
         PreparedStatement stmt = null;
         try {
             String sql = "INSERT INTO t_cl_goal " +
@@ -31,13 +34,14 @@ public class OracleGoalDao implements GoalDao {
             stmt.setString(7, goal.getPriority());
 
             stmt.executeUpdate();
+
+            return getCurrval("seq_goal_id");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Não foi possível registrar Meta");
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -45,14 +49,13 @@ public class OracleGoalDao implements GoalDao {
     }
 
     @Override
-    public List<Goal> finAllByUserId(int userId) throws DBException {
+    public List<Goal> findAllByUserId(int userId) throws DBException {
         List<Goal> goals = new ArrayList<Goal>();
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_goal WHERE user_id = ? ORDER BY due_date ASC";
             conn.prepareStatement(sql);
             stmt.setInt(1, userId);
@@ -79,7 +82,6 @@ public class OracleGoalDao implements GoalDao {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -98,7 +100,6 @@ public class OracleGoalDao implements GoalDao {
         PreparedStatement stmt = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "UPDATE t_cl_goal " +
                     "SET title = ?, " +
                     "description = ?, " +
@@ -107,7 +108,8 @@ public class OracleGoalDao implements GoalDao {
                     "status = ?, " +
                     "updated_at = CURRENT_TIMESTAMP, " +
                     "priority = ? " +
-                    "WHERE goal_id = ?";
+                    "WHERE goal_id = ?" +
+                    "AND user_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, goal.getTitle());
             stmt.setString(2, goal.getDescription());
@@ -116,6 +118,7 @@ public class OracleGoalDao implements GoalDao {
             stmt.setString(5, goal.getStatus());
             stmt.setString(6, goal.getPriority());
             stmt.setInt(7, goal.getGoalId());
+            stmt.setInt(8, goal.getUserId());
 
             stmt.executeUpdate();
 
@@ -124,7 +127,6 @@ public class OracleGoalDao implements GoalDao {
             throw new DBException("Não foi possível editar meta");
         } finally {
             try {
-                if (conn != null) conn.close();
                 if (stmt != null) stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -137,7 +139,6 @@ public class OracleGoalDao implements GoalDao {
         PreparedStatement stmt = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "DELETE FROM t_cl_goal WHERE goal_id = ? AND user_id = ?";
             stmt = conn.prepareStatement(sql);
 
@@ -149,7 +150,6 @@ public class OracleGoalDao implements GoalDao {
             throw new DBException("Erro ao excluir meta");
         }finally {
             try {
-                if (conn != null) conn.close();
                 if (stmt != null) stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();

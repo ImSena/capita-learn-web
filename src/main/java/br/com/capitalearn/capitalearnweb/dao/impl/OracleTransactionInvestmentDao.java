@@ -3,6 +3,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.TransactionGoalDao;
 import br.com.capitalearn.capitalearnweb.dao.TransactionInvestmentDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.TransactionInvestment;
 
@@ -13,14 +14,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleTransactionInvestmentDao implements TransactionInvestmentDao {
-    private Connection conn;
+public class OracleTransactionInvestmentDao extends BaseDao implements TransactionInvestmentDao {
+    public OracleTransactionInvestmentDao(Connection conn) {
+        super(conn);
+    }
 
     @Override
-    public void register(TransactionInvestment investment) throws DBException {
+    public int register(TransactionInvestment investment) throws DBException {
         PreparedStatement stmt = null;
+        PreparedStatement stmtId = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "INSERT INTO t_cl_transaction_investment (transaction_investment_id, transaction_id, investment_id) " +
                     "VALUES (seq_transaction_investment_id.NEXTVAL, ?, ?)";
             stmt = conn.prepareStatement(sql);
@@ -28,13 +31,14 @@ public class OracleTransactionInvestmentDao implements TransactionInvestmentDao 
             stmt.setInt(2, investment.getInvestmentId());
             stmt.executeUpdate();
 
+            return getCurrval("seq_transaction_investment_id");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Não foi possível registrar a transação de investimento");
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
+                if (stmtId != null) stmtId.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -47,7 +51,6 @@ public class OracleTransactionInvestmentDao implements TransactionInvestmentDao 
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_transaction_investment WHERE transaction_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, transactionId);
@@ -68,7 +71,6 @@ public class OracleTransactionInvestmentDao implements TransactionInvestmentDao 
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -82,7 +84,6 @@ public class OracleTransactionInvestmentDao implements TransactionInvestmentDao 
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_transaction_investment WHERE investment_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, investmentId);
@@ -103,7 +104,6 @@ public class OracleTransactionInvestmentDao implements TransactionInvestmentDao 
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -115,7 +115,6 @@ public class OracleTransactionInvestmentDao implements TransactionInvestmentDao 
     public void delete(int transactionInvestmentId) throws DBException {
         PreparedStatement stmt = null;
         try {
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "DELETE FROM t_cl_transaction_investment WHERE transaction_investment_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, transactionInvestmentId);
@@ -126,7 +125,6 @@ public class OracleTransactionInvestmentDao implements TransactionInvestmentDao 
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

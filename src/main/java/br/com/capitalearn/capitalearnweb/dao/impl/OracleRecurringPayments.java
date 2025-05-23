@@ -2,6 +2,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.RecurringPaymentsDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.RecurringPayments;
 
@@ -9,14 +10,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleRecurringPayments implements RecurringPaymentsDao {
-    private Connection conn;
+public class OracleRecurringPayments extends BaseDao implements RecurringPaymentsDao {
+
+    public OracleRecurringPayments(Connection conn) {
+        super(conn);
+    }
 
     @Override
-    public void register(RecurringPayments payment) throws DBException {
+    public int register(RecurringPayments payment) throws DBException {
         PreparedStatement stmt = null;
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "INSERT INTO t_cl_recurring_payments " +
                     "(recurring_payment_id, amount, description, cycle, next_payment_date, status, created_at, updated_at, user_id) " +
                     "VALUES (seq_recurring_payments_id.NEXTVAL, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
@@ -30,13 +33,13 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
 
             stmt.executeUpdate();
 
+            return getCurrval("seq_recurring_payments_id");
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DBException("Não foi possível atualizar o pagamento");
+            throw new DBException("Não foi possível registrar o pagamento");
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -50,7 +53,6 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
         ResultSet rs = null;
 
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "SELECT * FROM t_cl_recurring_payments WHERE user_id = ? ORDER BY created_at DESC";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, userId);
@@ -70,11 +72,10 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DBException("Não foi possível atualizar o pagamento");
+            throw new DBException("Não foi possível encontrar os pagamentos");
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
                 if (rs != null) rs.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -94,7 +95,6 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
         PreparedStatement stmt = null;
 
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "UPDATE t_cl_recurring_payments " +
                     "SET amount = ?, " +
                     "description = ?, " +
@@ -102,7 +102,7 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
                     "next_payment_date = ?, " +
                     "status = ?, " +
                     "updated_at = CURRENT_TIMESTAMP " +
-                    "WHERE recurring_payment_id = ?";
+                    "WHERE recurring_payment_id = ? AND user_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setDouble(1, payment.getAmount());
             stmt.setString(2, payment.getDescription());
@@ -110,6 +110,7 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
             stmt.setDate(4, Date.valueOf(payment.getNextPaymentDate()));
             stmt.setString(5, payment.getStatus());
             stmt.setInt(6, payment.getRecurringPaymentId());
+            stmt.setInt(7, payment.getUserId());
 
             stmt.executeUpdate();
 
@@ -119,7 +120,6 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -127,23 +127,21 @@ public class OracleRecurringPayments implements RecurringPaymentsDao {
     }
 
     @Override
-    public void delete(int id, int userId) throws DBException {
+    public void delete(RecurringPayments recurringPayments) throws DBException {
         PreparedStatement stmt = null;
 
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "DELETE FROM t_cl_recurring_payments WHERE recurring_payment_id = ? AND user_id = ?";
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
-            stmt.setInt(2, userId);
+            stmt.setInt(1, recurringPayments.getRecurringPaymentId());
+            stmt.setInt(2, recurringPayments.getUserId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DBException("Não foi possível atualizar o investimento");
+            throw new DBException("Não foi possível deletar o investimento");
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

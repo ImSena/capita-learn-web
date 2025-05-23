@@ -2,6 +2,7 @@ package br.com.capitalearn.capitalearnweb.dao.impl;
 
 import br.com.capitalearn.capitalearnweb.dao.ConnectionManager;
 import br.com.capitalearn.capitalearnweb.dao.TransactionDao;
+import br.com.capitalearn.capitalearnweb.dao.base.BaseDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.model.Transaction;
 
@@ -13,16 +14,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OracleTransactionDao implements TransactionDao {
+public class OracleTransactionDao extends BaseDao implements TransactionDao {
 
-    private Connection conn;
+    public OracleTransactionDao(Connection conn) {
+        super(conn);
+    }
 
     @Override
-    public void register(Transaction transaction, int userId) throws DBException {
+    public int register(Transaction transaction) throws DBException {
         PreparedStatement stmt = null;
 
         try {
-            conn = ConnectionManager.getInstance().getConnection();
 
             String sql = "INSERT INTO t_cl_transaction" +
                     "(transaction_id, amount, category, description, created_at, updated_at, user_id, transaction_type, title) " +
@@ -33,18 +35,19 @@ public class OracleTransactionDao implements TransactionDao {
             stmt.setDouble(1, transaction.getAmount());
             stmt.setString(2, transaction.getCategory());
             stmt.setString(3, transaction.getDescription());
-            stmt.setInt(4, userId);
+            stmt.setInt(4, transaction.getUserId());
             stmt.setString(5, transaction.getTransactionType());
             stmt.setString(6, transaction.getTitle());
 
             stmt.executeUpdate();
+
+            return getCurrval("seq_transaction_id");
 
         } catch (SQLException e) {
             throw new DBException("Erro ao registrar transação");
         } finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -52,7 +55,7 @@ public class OracleTransactionDao implements TransactionDao {
     }
 
     @Override
-    public void findById(Transaction transaction, int userId) throws DBException {
+    public void findById(Transaction transaction) throws DBException {
 
     }
 
@@ -63,8 +66,6 @@ public class OracleTransactionDao implements TransactionDao {
         ResultSet rs = null;
 
         try{
-            conn = ConnectionManager.getInstance().getConnection();
-
             String sql = "SELECT * FROM t_cl_transaction WHERE user_id = ? ORDER BY created_at DESC";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, userId);
@@ -93,7 +94,6 @@ public class OracleTransactionDao implements TransactionDao {
             try {
                 if(rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -103,11 +103,10 @@ public class OracleTransactionDao implements TransactionDao {
     }
 
     @Override
-    public void update(Transaction transaction, int userId) throws DBException {
+    public void update(Transaction transaction) throws DBException {
         PreparedStatement stmt = null;
 
         try{
-            conn = ConnectionManager.getInstance().getConnection();
             String sql = "UPDATE t_cl_transaction " +
                     "SET amount = ?, " +
                     "category = ?, " +
@@ -124,7 +123,7 @@ public class OracleTransactionDao implements TransactionDao {
             stmt.setString(4, transaction.getTransactionType());
             stmt.setString(5, transaction.getTitle());
             stmt.setInt(6, transaction.getTransactionId());
-            stmt.setInt(7, userId);
+            stmt.setInt(7, transaction.getUserId());
 
             stmt.executeUpdate();
 
@@ -134,7 +133,6 @@ public class OracleTransactionDao implements TransactionDao {
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -142,16 +140,15 @@ public class OracleTransactionDao implements TransactionDao {
     }
 
     @Override
-    public void delete(Transaction transaction, int userId) throws DBException {
+    public void delete(Transaction transaction) throws DBException {
         PreparedStatement stmt = null;
 
         try{
-
             conn = ConnectionManager.getInstance().getConnection();
             String sql = "DELETE FROM t_cl_transaction WHERE transaction_id = ? AND user_id = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, transaction.getTransactionId());
-            stmt.setInt(2, userId);
+            stmt.setInt(2, transaction.getUserId());
 
             stmt.executeUpdate();
         }catch(SQLException e){
@@ -160,7 +157,6 @@ public class OracleTransactionDao implements TransactionDao {
         }finally {
             try {
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
