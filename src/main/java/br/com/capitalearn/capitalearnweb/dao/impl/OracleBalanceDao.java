@@ -72,6 +72,7 @@ public class OracleBalanceDao extends BaseDao implements BalanceDao {
         try {
             String sql = "SELECT * FROM t_cl_balance WHERE user_id = ?";
             stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, userId);
             rs = stmt.executeQuery();
             if (rs.next()) {
                 balance.setBalanceAmount(rs.getDouble("balance_amount"));
@@ -84,7 +85,6 @@ public class OracleBalanceDao extends BaseDao implements BalanceDao {
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

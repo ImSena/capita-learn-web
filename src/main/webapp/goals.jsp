@@ -87,8 +87,8 @@
     </div>
 </div>
 
-<%@include file="components/modais/addSaldo.jsp"%>
-<%@include file="components/modais/removeSaldo.jsp"%>
+<%@include file="components/modais/addGoal.jsp"%>
+<%@include file="components/modais/removeGoal.jsp"%>
 
 
 <div class="modal fade" id="modalNovaMeta" tabindex="-1" aria-labelledby="modalNovaMetaLabel" aria-hidden="true">

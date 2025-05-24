@@ -30,7 +30,7 @@
             <input type="text" class="form-control" id="descricaoAdicionar" placeholder="Ex: Empresa X" name="description">
           </div>
           <input type="hidden" name="action" value="ADD"/>
-          <input type="hidden" name="category" value="NORMAL"/>
+          <input type="hidden" name="category" value="GOAL"/>
           <input type="hidden" name="redirectTo" value="dashboard.jsp"/>
 
           <button type="submit" class="btn btn-success">Adicionar</button>

@@ -27,6 +27,7 @@ public abstract class BaseService {
                     ex.printStackTrace();
                 }
             }
+            e.printStackTrace();
             throw new DBException("Erro ao executar transação", e);
         } finally {
             if (conn != null) {

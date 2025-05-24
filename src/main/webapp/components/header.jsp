@@ -39,10 +39,23 @@
         </div>
 
         <div>
-            <span id="value_total">
+            <span id="value_total" data-value="${balance}">
                 <fmt:setLocale value="pt_BR"/>
-                <fmt:formatNumber value="${user.amount}" type="currency" currencySymbol="R$" groupingUsed="true" maxFractionDigits="2"/>
+                <fmt:formatNumber value="${balance}" type="currency" currencySymbol="R$" groupingUsed="true" maxFractionDigits="2"/>
             </span>
         </div>
     </div>
 </header>
+
+<c:if test="${not empty success || not empty error}">
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div class="toast align-items-center text-white ${not empty success ? 'bg-success' : 'bg-danger'} border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <c:out value="${not empty success ? success : error}" />
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</c:if>

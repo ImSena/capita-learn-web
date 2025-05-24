@@ -42,6 +42,7 @@ public class LoginServlet extends HttpServlet {
 
             if (user != null) {
                 req.getSession().setAttribute("user", user);
+                req.getSession().setAttribute("balance", user.getAmount());
                 resp.sendRedirect(req.getContextPath() + "/dashboard.jsp"); // ou dashboard
             } else {
                 req.setAttribute("error", "Usuário ou senha inválidos");

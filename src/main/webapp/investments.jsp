@@ -79,8 +79,8 @@
     </div>
 </div>
 
-<%@include file="components/modais/addSaldo.jsp"%>
-<%@include file="components/modais/removeSaldo.jsp"%>
+<%@include file="components/modais/addInvestment.jsp"%>
+<%@include file="components/modais/removeInvestment.jsp"%>
 
 
 <div class="modal fade" id="modalInvestimento" tabindex="-1" aria-labelledby="modalInvestimentoLabel"

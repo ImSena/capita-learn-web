@@ -14,19 +14,25 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
       <div class="modal-body">
-        <form id="formRetirar" action="adicionar" method="POST">
-          <input type="hidden" name="action" value="adicionar" />
+        <form id="formRetirar" action="transaction" method="POST">
           <div class="mb-3">
-            <label for="valorRetirar" class="form-label">Valor</label>
-            <input type="number" class="form-control" id="valorRetirar" placeholder="Ex: 50.00"
+            <label for="title" class="form-label">Titulo*</label>
+            <input type="text" class="form-control" id="title" placeholder="Ex: Salário" name="title">
+          </div>
+          <div class="mb-3">
+            <label for="valorAdicionar" class="form-label">Valor*</label>
+            <input type="number" class="form-control" id="valorAdicionar" name="amount" placeholder="Ex: 150.00"
                    required>
           </div>
           <div class="mb-3">
-            <label for="descricaoRetirar" class="form-label">Descrição</label>
-            <input type="text" class="form-control" id="descricaoRetirar"
-                   placeholder="Ex: Compra mercado">
+            <label for="descricaoAdicionar" class="form-label">Descrição</label>
+            <input type="text" class="form-control" id="descricaoAdicionar" placeholder="Ex: Empresa X" name="description">
           </div>
           <button type="submit" class="btn btn-danger">Retirar</button>
+
+          <input type="hidden" name="action" value="REMOVE"/>
+          <input type="hidden" name="category" value="NORMAL"/>
+          <input type="hidden" name="redirectTo" value="dashboard.jsp"/>
         </form>
       </div>
     </div>
