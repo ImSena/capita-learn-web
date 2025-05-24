@@ -16,6 +16,7 @@ public class Goal implements Serializable {
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private String priority; //NORMAL, HARD, HARDCORE
+    private Double goalAmountContain;
 
     public Goal() {}
 
@@ -125,5 +126,13 @@ public class Goal implements Serializable {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    public Double getGoalAmountContain() {
+        return goalAmountContain;
+    }
+
+    public void setGoalAmountContain(Double goalAmountContain) {
+        this.goalAmountContain = goalAmountContain;
     }
 }

@@ -6,6 +6,8 @@ import br.com.capitalearn.capitalearnweb.factory.DaoFactory;
 import br.com.capitalearn.capitalearnweb.model.*;
 import br.com.capitalearn.capitalearnweb.service.base.BaseService;
 
+import java.util.List;
+
 public class TransactionService extends BaseService {
 
     public Balance registerTransaction(Transaction transaction) throws DBException, IllegalArgumentException {
@@ -57,6 +59,25 @@ public class TransactionService extends BaseService {
             return balance;
         });
 
+    }
+
+    public List<Transaction> getTransactions(int userId) throws DBException
+    {
+        return executeInTransaction(conn -> {
+            DaoFactory daoFactory = new DaoFactory(conn);
+            TransactionDao transactionDao = daoFactory.getTransactionDao();
+
+            return transactionDao.findAll(userId);
+        });
+    }
+
+    public List<Transaction> getTransactionByMonth(int userId, String month, String year) throws DBException
+    {
+        return executeInTransaction(conn -> {
+            DaoFactory daoFactory = new DaoFactory(conn);
+            TransactionDao transactionDao = daoFactory.getTransactionDao();
+            return transactionDao.findByMonthYear(userId, month, year);
+        });
     }
 
 }

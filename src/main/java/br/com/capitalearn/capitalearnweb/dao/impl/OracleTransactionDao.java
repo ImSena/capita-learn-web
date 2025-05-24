@@ -103,6 +103,50 @@ public class OracleTransactionDao extends BaseDao implements TransactionDao {
     }
 
     @Override
+    public List<Transaction> findByMonthYear(int userId, String month, String year) throws DBException {
+        List<Transaction> list = new ArrayList<>();
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try{
+            String sql = "SELECT * FROM t_cl_transaction WHERE user_id = ? AND TO_CHAR(created_at, 'MM') = ? AND TO_CHAR(created_at, 'YYYY') = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, userId);
+            stmt.setString(2, month);
+            stmt.setString(3, year);
+
+            rs = stmt.executeQuery();
+
+            while(rs.next()){
+                Transaction t = new Transaction();
+                t.setTransactionId(rs.getInt("transaction_id"));
+                t.setTitle(rs.getString("title"));
+                t.setAmount(rs.getDouble("amount"));
+                t.setCategory(rs.getString("category"));
+                t.setDescription(rs.getString("description"));
+                t.setTransactionType(rs.getString("transaction_type"));
+                t.setCreatedAt(LocalDate.from(rs.getTimestamp("created_at").toLocalDateTime()));
+                t.setUpdatedAt(LocalDate.from(rs.getTimestamp("updated_at").toLocalDateTime()));
+                t.setUserId(rs.getInt("user_id"));
+                list.add(t);
+            }
+
+        }catch(SQLException e){
+            throw new DBException("Erro ao buscar transações por mês e ano", e);
+        }finally {
+            try{
+                if(rs != null) rs.close();
+                if(stmt != null) stmt.close();
+            }catch(SQLException e){
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }
+
+    @Override
     public void update(Transaction transaction) throws DBException {
         PreparedStatement stmt = null;
 

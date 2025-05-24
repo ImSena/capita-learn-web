@@ -1,5 +1,6 @@
 package br.com.capitalearn.capitalearnweb.controller.publ;
 
+import br.com.capitalearn.capitalearnweb.controller.base.BaseServlet;
 import br.com.capitalearn.capitalearnweb.dao.UserDao;
 import br.com.capitalearn.capitalearnweb.exception.AuthenticationException;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
@@ -14,11 +15,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 @WebServlet(value = "/login")
-public class LoginServlet extends HttpServlet {
+public class LoginServlet extends BaseServlet {
 
     private UserDao dao;
     public LoginServlet() {
-        super();
+        super(false);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class LoginServlet extends HttpServlet {
             if (user != null) {
                 req.getSession().setAttribute("user", user);
                 req.getSession().setAttribute("balance", user.getAmount());
-                resp.sendRedirect(req.getContextPath() + "/dashboard.jsp"); // ou dashboard
+                resp.sendRedirect(req.getContextPath() + "/dashboard"); // ou dashboard
             } else {
                 req.setAttribute("error", "Usuário ou senha inválidos");
                 req.getRequestDispatcher("/login.jsp").forward(req, resp);

@@ -11,4 +11,5 @@ public interface TransactionDao {
     List<Transaction> findAll(int userId) throws DBException;
     void update(Transaction transaction) throws DBException;
     void delete(Transaction transaction) throws DBException;
+    List<Transaction> findByMonthYear(int userId, String month, String year) throws DBException;
 }

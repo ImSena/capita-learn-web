@@ -21,8 +21,8 @@ public class OracleGoalDao extends BaseDao implements GoalDao {
         PreparedStatement stmt = null;
         try {
             String sql = "INSERT INTO t_cl_goal " +
-                    "(goal_id, user_id, title, description, goal_amount, due_date, status, created_at, updated_at, priority) " +
-                    "VALUES (seq_goal_id.NEXTVAL, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
+                    "(goal_id, user_id, title, description, goal_amount, due_date, status, created_at, updated_at, priority, goal_amount_contain) " +
+                    "VALUES (seq_goal_id.NEXTVAL, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)";
 
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, goal.getUserId());
@@ -32,6 +32,7 @@ public class OracleGoalDao extends BaseDao implements GoalDao {
             stmt.setDate(5, Date.valueOf(goal.getDueDate()));
             stmt.setString(6, goal.getStatus());
             stmt.setString(7, goal.getPriority());
+            stmt.setDouble(8, goal.getGoalAmountContain());
 
             stmt.executeUpdate();
 
@@ -57,7 +58,7 @@ public class OracleGoalDao extends BaseDao implements GoalDao {
 
         try {
             String sql = "SELECT * FROM t_cl_goal WHERE user_id = ? ORDER BY due_date ASC";
-            conn.prepareStatement(sql);
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, userId);
             rs = stmt.executeQuery();
             while (rs.next()) {
@@ -72,6 +73,7 @@ public class OracleGoalDao extends BaseDao implements GoalDao {
                 goal.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime().toLocalDate());
                 goal.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime().toLocalDate());
                 goal.setPriority(rs.getString("priority"));
+                goal.setGoalAmountContain(rs.getDouble("goal_amount_contain"));
 
                 goals.add(goal);
             }
@@ -107,7 +109,8 @@ public class OracleGoalDao extends BaseDao implements GoalDao {
                     "due_date = ?, " +
                     "status = ?, " +
                     "updated_at = CURRENT_TIMESTAMP, " +
-                    "priority = ? " +
+                    "priority = ?, " +
+                    "goal_amount_contain = ? " +
                     "WHERE goal_id = ?" +
                     "AND user_id = ?";
             stmt = conn.prepareStatement(sql);
@@ -117,8 +120,9 @@ public class OracleGoalDao extends BaseDao implements GoalDao {
             stmt.setDate(4, Date.valueOf(goal.getDueDate()));
             stmt.setString(5, goal.getStatus());
             stmt.setString(6, goal.getPriority());
-            stmt.setInt(7, goal.getGoalId());
-            stmt.setInt(8, goal.getUserId());
+            stmt.setDouble(7, goal.getGoalAmountContain());
+            stmt.setInt(8, goal.getGoalId());
+            stmt.setInt(9, goal.getUserId());
 
             stmt.executeUpdate();
 

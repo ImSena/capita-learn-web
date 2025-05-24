@@ -1,4 +1,4 @@
-<%--
+<%@ page import="br.com.capitalearn.capitalearnweb.model.Goal" %><%--
   Created by IntelliJ IDEA.
   User: Bruno
   Date: 19/05/2025
@@ -6,12 +6,14 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@include file="components/head.jsp" %>
 <div class="root">
-    <%@include file="components/menuSide.jsp"%>
+    <%@include file="components/menuSide.jsp" %>
 
     <div id="application">
-        <%@include file="components/header.jsp"%>
+        <%@include file="components/header.jsp" %>
 
         <main class="container">
             <nav id="content_actions">
@@ -58,37 +60,57 @@
 
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
                     <!-- Exemplo de meta -->
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Viagem para o Chile</h5>
-                                <p class="card-text">Quero viajar em julho com a família</p>
-                                <p class="card-text"><strong>Objetivo:</strong> R$ 8.000,00</p>
-                                <p class="card-text"><strong>Guardado:</strong> R$ 2.300,00</p>
+                    <c:forEach var="goal" items="${goals}">
+                        <div class="col">
+                            <div class="card cards-contents h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${goal.title}</h5>
+                                    <p class="card-text">${goal.description}</p>
+                                    <p class="card-text"><strong>Objetivo:</strong> R$ ${goal.goalAmount}</p>
+                                    <p class="card-text"><strong>Guardado:</strong> R$ ${goal.goalAmountContain}</p>
 
-                                <div class="progress mt-2">
-                                    <div class="progress-bar" role="progressbar" style="width: 28%"
-                                         aria-valuenow="28" aria-valuemin="0" aria-valuemax="100">28%</div>
+                                    <c:set var="amount" value="${goal.goalAmount}"/>
+                                    <c:set var="contain" value="${goal.goalAmountContain}"/>
+                                    <c:set var="progressRaw" value="${(contain / amount) * 100}" />
+                                    <fmt:formatNumber var="progress" value="${progressRaw}" maxFractionDigits="0" />
+
+                                    <div class="progress mt-2">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width: ${progress}%"
+                                             aria-valuenow="${progress}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                                ${progress}%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between">
+                                    <form method="get" action="editar-goal">
+                                        <input type="hidden" name="id" value="${goal.goalId}"/>
+                                        <button class="btn btn-outline-secondary btn-sm" type="submit">Editar</button>
+                                    </form>
+                                    <form method="post" action="deletar-goal"
+                                          onsubmit="return confirm('Tem certeza que deseja excluir esta meta?');">
+                                        <input type="hidden" name="id" value="${goal.goalId}"/>
+                                        <button class="btn btn-outline-danger btn-sm" type="submit">Excluir</button>
+                                    </form>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <button class="btn btn-outline-secondary btn-sm">Editar</button>
-                                <button class="btn btn-outline-danger btn-sm">Excluir</button>
-                            </div>
                         </div>
-                    </div>
+                    </c:forEach>
+
 
                     <!-- Outras metas vão aqui -->
                 </div>
             </section>
         </main>
 
-        <%@include file="components/menuMobile.jsp"%>
+        <%@include file="components/menuMobile.jsp" %>
     </div>
 </div>
 
-<%@include file="components/modais/addGoal.jsp"%>
-<%@include file="components/modais/removeGoal.jsp"%>
+<%@include file="components/modais/addGoal.jsp" %>
+<%@include file="components/modais/removeGoal.jsp" %>
 
 
 <div class="modal fade" id="modalNovaMeta" tabindex="-1" aria-labelledby="modalNovaMetaLabel" aria-hidden="true">
@@ -99,23 +121,40 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-                <form id="formNovaMeta">
+                <form id="formNovaMeta" action="goals" method="POST">
                     <div class="mb-3">
                         <label for="tituloMeta" class="form-label">Título da Meta</label>
-                        <input type="text" class="form-control" id="tituloMeta" placeholder="Ex: Novo notebook"
+                        <input type="text" class="form-control" id="tituloMeta" name="title"
+                               placeholder="Ex: Novo notebook"
                                required>
                     </div>
                     <div class="mb-3">
                         <label for="descricaoMeta" class="form-label">Descrição</label>
-                        <input type="text" class="form-control" id="descricaoMeta" placeholder="Motivo da meta">
+                        <input type="text" class="form-control" id="descricaoMeta" name="description"
+                               placeholder="Motivo da meta">
+                    </div>
+                    <div class="mb-3">
+                        <label for="dueDate" class="form-label">Data Vencimento</label>
+                        <input type="date" class="form-control" id="dueDate" name="dueDate">
                     </div>
                     <div class="mb-3">
                         <label for="valorMeta" class="form-label">Valor necessário</label>
-                        <input type="number" class="form-control" id="valorMeta" placeholder="Ex: 3000.00" required>
+                        <input type="number" class="form-control" id="valorMeta" name="goalAmount"
+                               placeholder="Ex: 3000.00" required>
                     </div>
                     <div class="mb-3">
                         <label for="valorGuardado" class="form-label">Já guardado</label>
-                        <input type="number" class="form-control" id="valorGuardado" placeholder="Ex: 500.00">
+                        <input type="number" class="form-control" name="goalAmountContain" id="valorGuardado"
+                               placeholder="Ex: 500.00">
+                    </div>
+                    <div class="mb-3">
+                        <label for="valorGuardado" class="form-label">Prioridade</label>
+                        <select name="priority" class="form-select" id="valorGuardado">
+                            <option selected hidden>Escolher</option>
+                            <option value="HARD">Alta</option>
+                            <option value="NORMAL">Média</option>
+                            <option value="EASY">Baixa</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-success">Salvar Meta</button>
                 </form>
@@ -125,5 +164,4 @@
 </div>
 
 
-
-<%@include file="components/bottom.jsp"%>
+<%@include file="components/bottom.jsp" %>

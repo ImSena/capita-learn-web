@@ -460,7 +460,7 @@ header>.search_content>label {
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: white;
+    background-color: var(--bg-contrast);
     cursor: pointer;
 }
 
@@ -504,6 +504,11 @@ header>.search_content>label {
 .saldo {
     font-weight: bold;
     font-size: 1.1rem;
+}
+
+.cards-contents{
+    background: var(--bg-contrast) !important;
+    color: white !important;
 }
 
 @media (max-width: 1200px) {

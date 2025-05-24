@@ -1,5 +1,6 @@
 package br.com.capitalearn.capitalearnweb.controller.publ;
 
+import br.com.capitalearn.capitalearnweb.controller.base.BaseServlet;
 import br.com.capitalearn.capitalearnweb.dao.UserDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.factory.DaoFactory;
@@ -17,10 +18,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 @WebServlet(value = "/cadastro")
-public class RegisterServlet extends HttpServlet {
+public class RegisterServlet extends BaseServlet {
 
     public RegisterServlet() {
-        super();
+        super(false);
     }
 
     @Override

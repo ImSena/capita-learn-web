@@ -59,7 +59,7 @@
                     <!-- Cada investimento será inserido aqui dinamicamente com JS -->
                     <!-- Exemplo de um card de investimento -->
                     <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card shadow-sm">
+                        <div class="card cards-contents shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title">Tesouro Selic</h5>
                                 <p class="card-text mb-1"><strong>Valor Investido:</strong> R$ 1.000,00</p>

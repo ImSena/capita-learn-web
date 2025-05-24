@@ -23,16 +23,19 @@ public abstract class BaseServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String uri = req.getRequestURI();
+
+        if (uri.matches(".*(\\.css|\\.js|\\.png|\\.jpg|\\.jpeg|\\.gif|\\.svg|\\.woff2?|\\.ttf)$")) {
+            super.service(req, resp);
+            return;
+        }
+
         HttpSession session = req.getSession(false);
 
         if (validateSession) {
             if (session == null || session.getAttribute("user") == null) {
-                try {
-                    resp.sendRedirect(req.getContextPath() + "/login");
-                    return;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                resp.sendRedirect(req.getContextPath() + "/login");
+                return;
             }
         }
 
