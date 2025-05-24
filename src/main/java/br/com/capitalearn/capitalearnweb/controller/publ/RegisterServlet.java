@@ -4,6 +4,7 @@ import br.com.capitalearn.capitalearnweb.dao.UserDao;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.factory.DaoFactory;
 import br.com.capitalearn.capitalearnweb.model.User;
+import br.com.capitalearn.capitalearnweb.service.UserService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,8 +19,6 @@ import java.time.LocalDate;
 @WebServlet(value = "/cadastro")
 public class RegisterServlet extends HttpServlet {
 
-    private UserDao dao;
-
     public RegisterServlet() {
         super();
     }
@@ -27,7 +26,6 @@ public class RegisterServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        dao = DaoFactory.getUserDao();
     }
 
     @Override
@@ -61,12 +59,13 @@ public class RegisterServlet extends HttpServlet {
             user.setRole("CLIENT");
             user.setActive(true);
 
-            dao.register(user);
+            UserService userService = new UserService();
+            userService.registerWithBalance(user);
 
             String contextPath = req.getContextPath();
             resp.sendRedirect(contextPath + "/cadastro.jsp?status=success");
 
-        }catch (DBException e){
+        }catch (RuntimeException e){
             e.printStackTrace();
             String contextPath = req.getContextPath();
             resp.sendRedirect(contextPath + "/cadastro.jsp?status=error");

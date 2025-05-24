@@ -30,10 +30,10 @@ public class OracleBalanceDao extends BaseDao implements BalanceDao {
             stmt.executeUpdate();
 
             return getCurrval("seq_balance_id");
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Erro ao registrar o saldo.");
-        }finally {
+        } finally {
             try {
                 if (stmt != null) stmt.close();
             } catch (SQLException e) {
@@ -52,10 +52,10 @@ public class OracleBalanceDao extends BaseDao implements BalanceDao {
             stmt.setInt(2, balance.getUserId());
 
             stmt.executeUpdate();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Erro ao atualizar o saldo.");
-        }finally {
+        } finally {
             try {
                 if (stmt != null) stmt.close();
             } catch (SQLException e) {
@@ -65,23 +65,31 @@ public class OracleBalanceDao extends BaseDao implements BalanceDao {
     }
 
     @Override
-    public void findByUserId(int userId) throws DBException {
+    public Balance findByUserId(int userId) throws DBException {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        try{
+        Balance balance = new Balance();
+        try {
             String sql = "SELECT * FROM t_cl_balance WHERE user_id = ?";
             stmt = conn.prepareStatement(sql);
-        }catch(SQLException e) {
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                balance.setBalanceAmount(rs.getDouble("balance_amount"));
+                balance.setUserId(rs.getInt("user_id"));
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Erro ao buscar o saldo.");
-        }finally {
-            try{
+        } finally {
+            try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
                 if (conn != null) conn.close();
-            }catch(SQLException e){
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+
+        return balance;
     }
 }

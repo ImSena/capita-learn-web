@@ -1,16 +1,16 @@
 package br.com.capitalearn.capitalearnweb.controller.publ;
 
 import br.com.capitalearn.capitalearnweb.dao.UserDao;
+import br.com.capitalearn.capitalearnweb.exception.AuthenticationException;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
-import br.com.capitalearn.capitalearnweb.factory.DaoFactory;
 import br.com.capitalearn.capitalearnweb.model.User;
+import br.com.capitalearn.capitalearnweb.service.UserService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 @WebServlet(value = "/login")
@@ -24,7 +24,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        dao = DaoFactory.getUserDao();
     }
 
     @Override
@@ -38,9 +37,10 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("password");
 
         try {
-            User user = dao.findByEmail(email);
+            UserService userService = new UserService();
+            User user = userService.loginWithPassword(email, password);
 
-            if (user != null && BCrypt.checkpw(password, user.getPassword())) {
+            if (user != null) {
                 req.getSession().setAttribute("user", user);
                 resp.sendRedirect(req.getContextPath() + "/dashboard.jsp"); // ou dashboard
             } else {
@@ -50,6 +50,8 @@ public class LoginServlet extends HttpServlet {
         } catch (DBException e) {
             e.printStackTrace();
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erro no servidor");
+        }catch(AuthenticationException e){
+            e.printStackTrace();
         }
     }
 

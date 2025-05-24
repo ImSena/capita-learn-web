@@ -29,11 +29,6 @@ public class TransactionServlet extends BaseServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        transactionDao = DaoFactory.getTransactionDao();
-        transactionRecurringDao = DaoFactory.getTransactionRecurringDao();
-        transactionGoalDao = DaoFactory.getTransactionGoalDao();
-        transactionInvestmentDao = DaoFactory.getTransactionInvestmentDao();
-        balanceDao = DaoFactory.getBalanceDao();
     }
 
     @Override

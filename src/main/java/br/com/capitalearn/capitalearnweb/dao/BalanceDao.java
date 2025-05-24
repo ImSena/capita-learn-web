@@ -7,6 +7,6 @@ import java.sql.Connection;
 
 public interface BalanceDao{
     void update(Balance balance) throws DBException;
-    void findByUserId(int userId) throws DBException;
+    Balance findByUserId(int userId) throws DBException;
     int register(Balance balance) throws DBException;
 }
