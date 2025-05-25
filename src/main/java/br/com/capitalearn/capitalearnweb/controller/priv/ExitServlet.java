@@ -1,20 +1,17 @@
 package br.com.capitalearn.capitalearnweb.controller.priv;
 
+import br.com.capitalearn.capitalearnweb.controller.base.BaseServlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebServlet(value = "/investments")
-
-public class InvestmentsServlet extends HttpServlet {
-    public InvestmentsServlet() {
-        super();
-    }
+@WebServlet(value = "/exit")
+public class ExitServlet extends BaseServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -23,16 +20,12 @@ public class InvestmentsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/investments.jsp").forward(req, resp);
-    }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
-    }
+        HttpSession session = req.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
 
-    @Override
-    public void destroy() {
-        super.destroy();
+        resp.sendRedirect(req.getContextPath() + "/login.jsp");
     }
 }

@@ -7,6 +7,7 @@ public class RecurringPayments implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private int recurringPaymentId;
+    private String title;
     private Double amount;
     private String description;
     private String cycle; //MONTH, WEEK, DAY
@@ -109,5 +110,13 @@ public class RecurringPayments implements Serializable {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
     }
 }

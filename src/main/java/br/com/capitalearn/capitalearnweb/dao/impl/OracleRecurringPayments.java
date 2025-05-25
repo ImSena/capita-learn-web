@@ -21,8 +21,8 @@ public class OracleRecurringPayments extends BaseDao implements RecurringPayment
         PreparedStatement stmt = null;
         try{
             String sql = "INSERT INTO t_cl_recurring_payments " +
-                    "(recurring_payment_id, amount, description, cycle, next_payment_date, status, created_at, updated_at, user_id) " +
-                    "VALUES (seq_recurring_payments_id.NEXTVAL, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)";
+                    "(recurring_payment_id, amount, description, cycle, next_payment_date, status, created_at, updated_at, user_id, title) " +
+                    "VALUES (seq_recurring_payment_id.NEXTVAL, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?)";
             stmt = conn.prepareStatement(sql);
             stmt.setDouble(1, payment.getAmount());
             stmt.setString(2, payment.getDescription());
@@ -30,10 +30,11 @@ public class OracleRecurringPayments extends BaseDao implements RecurringPayment
             stmt.setDate(4, Date.valueOf(payment.getNextPaymentDate()));
             stmt.setString(5, payment.getStatus());
             stmt.setInt(6, payment.getUserId());
+            stmt.setString(7, payment.getTitle());
 
             stmt.executeUpdate();
 
-            return getCurrval("seq_recurring_payments_id");
+            return getCurrval("seq_recurring_payment_id");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DBException("Não foi possível registrar o pagamento");

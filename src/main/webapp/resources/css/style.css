@@ -511,6 +511,11 @@ header>.search_content>label {
     color: white !important;
 }
 
+a.link-menu{
+    text-decoration: none;
+    color: white;
+}
+
 @media (max-width: 1200px) {
     .root {
         display: block;

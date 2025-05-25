@@ -16,38 +16,7 @@
         <%@include file="components/header.jsp" %>
 
         <main class="container">
-            <nav id="content_actions">
-                <div class="button_actions">
-                    <button class="btn" data-bs-toggle="modal" data-bs-target="#modalAdicionar">
-                        <i class="fa-solid fa-circle-plus"></i>
-                    </button>
-                    <span>Adicionar</span>
-                </div>
-                <div class="button_actions">
-                    <button class="btn" data-bs-toggle="modal" data-bs-target="#modalRetirar">
-                        <i class="fa-solid fa-circle-minus"></i>
-                    </button>
-                    <span>Retirar</span>
-                </div>
-                <div class="button_actions">
-                    <button class="btn">
-                        <i class="fa-solid fa-briefcase"></i>
-                    </button>
-                    <span>Serviços</span>
-                </div>
-                <div class="button_actions">
-                    <button class="btn">
-                        <i class="fa-solid fa-piggy-bank"></i>
-                    </button>
-                    <span>Metas</span>
-                </div>
-                <div class="button_actions">
-                    <button class="btn">
-                        <i class="fa-solid fa-square-poll-vertical"></i>
-                    </button>
-                    <span>Aplicações</span>
-                </div>
-            </nav>
+            <%@include file="components/actions.jsp" %>
 
             <section id="metas" class="mt-4">
                 <h2 class="mb-4">Minhas Metas</h2>
@@ -85,10 +54,20 @@
                                     </div>
                                 </div>
                                 <div class="card-footer d-flex justify-content-between">
-                                    <form method="get" action="editar-goal">
-                                        <input type="hidden" name="id" value="${goal.goalId}"/>
-                                        <button class="btn btn-outline-secondary btn-sm" type="submit">Editar</button>
-                                    </form>
+                                        <button
+                                                type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalEditarMeta"
+                                                data-id="${goal.goalId}"
+                                                data-title="${goal.title}"
+                                                data-description="${goal.description}"
+                                                data-goalamount="${goal.goalAmount}"
+                                                data-contain="${goal.goalAmountContain}"
+                                                data-duedate="${goal.dueDate}"
+                                                data-priority="${goal.priority}">
+                                            Editar
+                                        </button>
                                     <form method="post" action="deletar-goal"
                                           onsubmit="return confirm('Tem certeza que deseja excluir esta meta?');">
                                         <input type="hidden" name="id" value="${goal.goalId}"/>
@@ -162,6 +141,71 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalEditarMeta" tabindex="-1" aria-labelledby="modalEditarMetaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-actions">
+        <div class="modal-content modal-content-actions">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalEditarMetaLabel">Editar Meta</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarMeta" action="edit-goal" method="POST">
+                    <input type="hidden" name="goalId" id="editGoalId">
+
+                    <div class="mb-3">
+                        <label for="editTituloMeta" class="form-label">Título da Meta</label>
+                        <input type="text" class="form-control" id="editTituloMeta" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescricaoMeta" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="editDescricaoMeta" name="description">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDueDate" class="form-label">Data Vencimento</label>
+                        <input type="date" class="form-control" id="editDueDate" name="dueDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editValorMeta" class="form-label">Valor necessário</label>
+                        <input type="number" class="form-control" id="editValorMeta" name="goalAmount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editValorGuardado" class="form-label">Já guardado</label>
+                        <input type="number" class="form-control" id="editValorGuardado" name="goalAmountContain">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPrioridade" class="form-label">Prioridade</label>
+                        <select name="priority" class="form-select" id="editPrioridade">
+                            <option value="HARD">Alta</option>
+                            <option value="NORMAL">Média</option>
+                            <option value="EASY">Baixa</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modalEditar = document.getElementById('modalEditarMeta');
+    modalEditar.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        document.getElementById('editGoalId').value = button.getAttribute('data-id');
+        document.getElementById('editTituloMeta').value = button.getAttribute('data-title');
+        document.getElementById('editDescricaoMeta').value = button.getAttribute('data-description');
+        document.getElementById('editValorMeta').value = button.getAttribute('data-goalamount');
+        document.getElementById('editValorGuardado').value = button.getAttribute('data-contain');
+        document.getElementById('editDueDate').value = button.getAttribute('data-duedate');
+
+        const prioridade = button.getAttribute('data-priority');
+        const select = document.getElementById('editPrioridade');
+        select.value = prioridade;
+    });
+</script>
+
 
 
 <%@include file="components/bottom.jsp" %>

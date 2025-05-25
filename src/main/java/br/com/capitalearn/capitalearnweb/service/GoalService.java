@@ -27,4 +27,20 @@ public class GoalService extends BaseService {
         });
     }
 
+    public void update(Goal goal) throws DBException {
+        executeInTransactionVoid(conn -> {
+            DaoFactory daoFactory = new DaoFactory(conn);
+            GoalDao goalDao = daoFactory.getGoalDao();
+            goalDao.update(goal);
+        });
+    }
+
+    public void delete(Goal goal) throws DBException {
+        executeInTransactionVoid(conn -> {
+            DaoFactory daoFactory = new DaoFactory(conn);
+            GoalDao goalDao = daoFactory.getGoalDao();
+            goalDao.delete(goal);
+        });
+    }
+
 }

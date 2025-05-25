@@ -7,34 +7,44 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <nav id="content_actions">
-  <div class="button_actions">
-    <button class="btn" data-bs-toggle="modal" data-bs-target="#modalAdicionar">
-      <i class="fa-solid fa-circle-plus"></i>
-    </button>
-    <span>Adicionar</span>
-  </div>
-  <div class="button_actions">
-    <button class="btn" data-bs-toggle="modal" data-bs-target="#modalRetirar">
-      <i class="fa-solid fa-circle-minus"></i>
-    </button>
-    <span>Retirar</span>
-  </div>
-  <div class="button_actions">
-    <button class="btn">
-      <i class="fa-solid fa-briefcase"></i>
-    </button>
-    <span>Serviços</span>
-  </div>
-  <div class="button_actions">
-    <button class="btn">
-      <i class="fa-solid fa-piggy-bank"></i>
-    </button>
-    <span>Metas</span>
-  </div>
-  <div class="button_actions">
-    <button class="btn">
-      <i class="fa-solid fa-square-poll-vertical"></i>
-    </button>
-    <span>Aplicações</span>
-  </div>
+
+    <%
+        String currentUrl = request.getRequestURI();
+        boolean isDashboard = currentUrl.contains("/dashboard");
+    %>
+
+    <% if (isDashboard) { %>
+    <div class="button_actions">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#modalAdicionar">
+            <i class="fa-solid fa-circle-plus"></i>
+        </button>
+        <span>Adicionar</span>
+    </div>
+
+    <div class="button_actions">
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#modalRetirar">
+            <i class="fa-solid fa-circle-minus"></i>
+        </button>
+        <span>Retirar</span>
+    </div>
+    <% } %>
+
+    <div class="button_actions">
+        <button class="btn" id="btnRecorrentes">
+            <i class="fa-solid fa-briefcase"></i>
+        </button>
+        <span>Recorrentes</span>
+    </div>
+    <div class="button_actions">
+        <button class="btn" id="btnMetas">
+            <i class="fa-solid fa-piggy-bank"></i>
+        </button>
+        <span>Metas</span>
+    </div>
+    <div class="button_actions">
+        <button class="btn" id="btnAplicacoes">
+            <i class="fa-solid fa-square-poll-vertical"></i>
+        </button>
+        <span>Aplicações</span>
+    </div>
 </nav>

@@ -1,4 +1,4 @@
-package br.com.capitalearn.capitalearnweb.controller.priv;
+package br.com.capitalearn.capitalearnweb.controller.priv.goals;
 
 import br.com.capitalearn.capitalearnweb.controller.base.BaseServlet;
 import br.com.capitalearn.capitalearnweb.exception.DBException;
@@ -8,19 +8,17 @@ import br.com.capitalearn.capitalearnweb.service.GoalService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.util.List;
 
-@WebServlet(value = "/goals")
-public class GoalsServlet extends BaseServlet {
-    public GoalsServlet() {
-        super();
-    }
+@WebServlet(value = "/edit-goal")
+
+public class EditGoalsServlet extends BaseServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -28,25 +26,11 @@ public class GoalsServlet extends BaseServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try{
             User user = getUser(req);
 
-            GoalService goalService = new GoalService();
-            List<Goal> goals = goalService.getGoals(user.getId());
-            req.setAttribute("goals", goals);
-        }catch(DBException e){
-            e.printStackTrace();
-            req.setAttribute("error", e.getMessage());
-        }
-        req.getRequestDispatcher("/goals.jsp").forward(req, resp);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            User user = getUser(req);
-
+            int goalId = Integer.parseInt(req.getParameter("goalId"));
             String title = req.getParameter("title");
             String description = req.getParameter("description");
             String priority = req.getParameter("priority");
@@ -68,6 +52,7 @@ public class GoalsServlet extends BaseServlet {
             LocalDate dueDate = LocalDate.parse(dueDateStr);
 
             Goal goal = new Goal();
+            goal.setGoalId(goalId);
             goal.setTitle(title);
             goal.setDescription(description);
             goal.setGoalAmount(goalAmount);
@@ -77,24 +62,18 @@ public class GoalsServlet extends BaseServlet {
             goal.setUserId(user.getId());
 
             GoalService goalService = new GoalService();
-            goalService.save(goal);
-
+            goalService.update(goal);
+            req.setAttribute("success", "Meta editada com sucesso!");
             List<Goal> goals = goalService.getGoals(user.getId());
             req.setAttribute("goals", goals);
-
-            req.setAttribute("success", "Meta cadastrada com sucesso!");
-        } catch (DBException e) {
+        }catch(DBException e) {
             e.printStackTrace();
             req.setAttribute("error", e.getMessage());
-        } catch (IllegalArgumentException e) {
+        }catch(InvalidParameterException e){
+            e.printStackTrace();
             req.setAttribute("error", e.getMessage());
         }
 
         req.getRequestDispatcher("/goals.jsp").forward(req, resp);
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
     }
 }
