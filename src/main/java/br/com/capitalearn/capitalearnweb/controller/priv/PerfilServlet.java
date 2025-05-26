@@ -1,8 +1,11 @@
 package br.com.capitalearn.capitalearnweb.controller.priv;
 
+import br.com.capitalearn.capitalearnweb.controller.base.BaseServlet;
 import br.com.capitalearn.capitalearnweb.dao.UserDao;
+import br.com.capitalearn.capitalearnweb.exception.DBException;
 import br.com.capitalearn.capitalearnweb.factory.DaoFactory;
 import br.com.capitalearn.capitalearnweb.model.User;
+import br.com.capitalearn.capitalearnweb.service.UserService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,8 +17,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 
 @WebServlet(value = "/perfil")
-public class PerfilServlet extends HttpServlet {
-    private UserDao dao;
+public class PerfilServlet extends BaseServlet {
     public PerfilServlet() {
         super();
     }
@@ -44,7 +46,7 @@ public class PerfilServlet extends HttpServlet {
             return;
         }
 
-        User user = (User) session.getAttribute("user");
+        User user = getUser(req);
 
         String nome = req.getParameter("nome");
         String email = req.getParameter("email");
@@ -58,14 +60,17 @@ public class PerfilServlet extends HttpServlet {
         if (senha != null && !senha.trim().isEmpty()) {
             String hashSenha = BCrypt.hashpw(senha, BCrypt.gensalt(12));
             user.setPassword(hashSenha);
+        } else {
+            user.setPassword(((User) session.getAttribute("user")).getPassword());
         }
 
         try {
-            dao.update(user);
-            session.setAttribute("user", user); // atualiza na sessão também
+            UserService userService = new UserService();
+            userService.update(user);
+            session.setAttribute("user", user);
             req.setAttribute("user", user);
             req.setAttribute("success", "Perfil atualizado com sucesso.");
-        } catch (Exception e) {
+        } catch (DBException e) {
             e.printStackTrace();
             req.setAttribute("error", "Erro ao atualizar o perfil.");
         }

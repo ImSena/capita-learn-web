@@ -15,10 +15,16 @@
         <h2>Descubra um novo mundo de possibilidades financeiras. <span class="contrast">Inove seu futuro</span></h2>
         <p style="font-weight: 300; text-align: left; width: 100%;">Desperte seu potencial financeiro e conquiste seus objetivos com facilidade.</p>
 
-        <button class="btn btn-actions">Começar Agora <i class="fa-regular fa-circle-up"></i></button>
+        <button class="btn btn-actions" id="init">Começar Agora <i class="fa-regular fa-circle-up"></i></button>
 
         <p>Já tem uma conta? <a class="contrast" href="${pageContext.request.contextPath}/login">Login</a></p>
     </div>
 </main>
 
+<script>
+    const $btn = document.querySelector('#init');
+    $btn.addEventListener('click', () => {
+        window.location.href = '${pageContext.request.contextPath}/cadastro';
+    })
+</script>
 <%@include file="components/bottom.jsp"%>

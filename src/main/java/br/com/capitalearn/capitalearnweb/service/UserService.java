@@ -43,4 +43,12 @@ public class UserService extends BaseService {
         return user;
     }
 
+    public void update(User user) throws DBException {
+        executeInTransactionVoid(conn -> {
+            DaoFactory daoFactory = new DaoFactory(conn);
+            UserDao userDao = daoFactory.getUserDao();
+            userDao.update(user);
+        });
+    }
+
 }

@@ -1,5 +1,6 @@
 package br.com.capitalearn.capitalearnweb.controller.priv;
 
+import br.com.capitalearn.capitalearnweb.controller.base.BaseServlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet(value = "/config")
-public class ConfigServlet extends HttpServlet {
+public class ConfigServlet extends BaseServlet {
     public ConfigServlet() {
         super();
     }

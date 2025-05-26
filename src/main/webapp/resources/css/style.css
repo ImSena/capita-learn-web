@@ -516,6 +516,10 @@ a.link-menu{
     color: white;
 }
 
+option{
+    color: black !important;
+}
+
 @media (max-width: 1200px) {
     .root {
         display: block;

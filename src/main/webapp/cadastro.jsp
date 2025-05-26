@@ -7,6 +7,18 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="components/head.jsp" %>
+<style>
+    @media(min-width:768px){
+     .image-form{
+         height: 100vh;
+     }
+    }
+    @media(max-width:767px){
+        .image-form{
+            display:none;
+        }
+    }
+</style>
 <main class="d-flex content-init">
     <div class="image-form">
     </div>

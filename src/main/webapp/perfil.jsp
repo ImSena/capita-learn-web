@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@include file="components/protect.jsp"%>
 <%@include file="components/head.jsp" %>
 <div class="root">
   <%@include file="components/menuSide.jsp"%>
@@ -15,14 +16,6 @@
 
     <main class="container" style="max-width: 600px; margin-top: 2rem;">
       <h2>Perfil do Usuário</h2>
-      <c:if test="${not empty success}">
-        <div class="alert alert-success">${success}</div>
-      </c:if>
-
-      <c:if test="${not empty error}">
-        <div class="alert alert-danger">${error}</div>
-      </c:if>
-
       <form id="form-perfil" method="POST" action="perfil">
         <div class="mb-3">
           <label for="nome" class="form-label">Nome Completo</label>

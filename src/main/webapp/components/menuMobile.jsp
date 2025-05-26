@@ -19,7 +19,7 @@
         <li><i class="fa-solid fa-house"></i><a href="dashboard" class="link-menu">Página Inicial</a></li>
         <li><i class="fa-solid fa-user"></i><a href="perfil" class="link-menu">Perfil</a></li>
         <li><i class="fa-solid fa-cog"></i><a href="config" class="link-menu">Configurações</a></li>
-        <li><i class="fa-solid fa-chart-line"></i><a href="exit" class="link-menu">Sair</a></li>
+        <li><i class="fa-solid fa-door-open"></i><a href="exit" class="link-menu">Sair</a></li>
       </ul>
     </nav>
   </div>

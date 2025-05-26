@@ -54,6 +54,8 @@ public class LoginServlet extends BaseServlet {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erro no servidor");
         }catch(AuthenticationException e){
             e.printStackTrace();
+            req.setAttribute("error", "Usuário ou senha inválidos");
+            req.getRequestDispatcher("/login.jsp").forward(req, resp);
         }
     }
 

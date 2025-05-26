@@ -38,12 +38,33 @@
             <i class="fa-solid fa-chevron-down"></i>
         </div>
 
-        <div>
-            <span id="value_total" data-value="${balance}">
-                <fmt:setLocale value="pt_BR"/>
+        <fmt:setLocale value="pt_BR"/>
+        <c:choose>
+            <c:when test="${balance lt 0}">
+                <div>
+            <span id="value_total" data-value="${balance}" class="text-danger">
                 <fmt:formatNumber value="${balance}" type="currency" currencySymbol="R$" groupingUsed="true" maxFractionDigits="2"/>
             </span>
-        </div>
+                </div>
+                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+                    <div class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ⚠️ Seu saldo está negativo. Fique atento aos seus gastos para evitar dívidas!
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div>
+            <span id="value_total" data-value="${balance}" class="text-success">
+                <fmt:formatNumber value="${balance}" type="currency" currencySymbol="R$" groupingUsed="true" maxFractionDigits="2"/>
+            </span>
+                </div>
+            </c:otherwise>
+        </c:choose>
     </div>
 </header>
 

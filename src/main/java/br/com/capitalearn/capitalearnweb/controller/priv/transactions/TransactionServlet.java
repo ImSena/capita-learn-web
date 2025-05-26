@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.util.List;
 
 @WebServlet("/transaction")
 public class TransactionServlet extends BaseServlet {
@@ -36,11 +37,7 @@ public class TransactionServlet extends BaseServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
-        String redirectTo = req.getParameter("redirectTo");
 
-        if(redirectTo == null || redirectTo.isEmpty()) {
-            redirectTo = "/dashboard";
-        }
 
         try{
             if(action == null || action.isEmpty() || (!action.equals("ADD") && !action.equals("REMOVE"))){
@@ -49,6 +46,10 @@ public class TransactionServlet extends BaseServlet {
 
             handleTransaction(req, resp, action);
             req.setAttribute("success", "Transação realizada com sucesso");
+            User user = getUser(req);
+            TransactionService transactionService = new TransactionService();
+            List<Transaction> transactions = transactionService.getTransactions(user.getId());
+            req.setAttribute("transactions", transactions);
         }catch(DBException e){
             e.printStackTrace();
             req.setAttribute("error", "Não foi possível realizar a transação");
@@ -57,8 +58,7 @@ public class TransactionServlet extends BaseServlet {
             req.setAttribute("error", e.getMessage());
         }
 
-        req.getRequestDispatcher(redirectTo).forward(req, resp);
-        resp.sendRedirect(redirectTo);
+        req.getRequestDispatcher("dashboard.jsp").forward(req, resp);
     }
 
     @Override

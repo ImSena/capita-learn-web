@@ -8,12 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%
-    if (session.getAttribute("user") == null) {
-        response.sendRedirect(request.getContextPath() + "/login");
-        return;
-    }
-%>
+<%@include file="components/protect.jsp"%>
 <%@ include file="components/head.jsp" %>
 <div class="root">
     <%@include file="components/menuSide.jsp" %>
@@ -39,9 +34,9 @@
                         <c:forEach var="transaction" items="${transactions}">
                             <div class="transacao">
                                 <div class="type">
-                                    <div class="content_img">
-                                        <img src="https://placehold.co/40" alt="">
-                                    </div>
+<%--                                    <div class="content_img">--%>
+<%--                                        <img src="https://placehold.co/40" alt="">--%>
+<%--                                    </div>--%>
                                     <div class="description">
                                         <span>${transaction.title}</span>
                                         <span>${transaction.createdAt}</span>
