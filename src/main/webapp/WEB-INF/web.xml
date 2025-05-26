@@ -18,4 +18,14 @@
         <url-pattern>*.jsp</url-pattern>
     </servlet-mapping>
 
+    <error-page>
+        <error-code>404</error-code>
+        <location>/dashboard.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/dashboard.jsp</location>
+    </error-page>
+
 </web-app>
